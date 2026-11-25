@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#0b5242" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<title>Le Jardin de Détente - غابة الراحة</title>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--g:#24b445;--g2:#158a36;--gd:#0c4d3b;--tint:#e6f5ea;--bg:#f7f8f8;--card:#ffffff;--line:#ecefef;--ink:#1b2621;--mute:#78857f;--amber:#f5b82e;--clay:#b3261e}
+*{box-sizing:border-box;margin:0;padding:0;font-family:"Cairo","Segoe UI",Tahoma,Arial,sans-serif;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--ink);padding-bottom:94px;line-height:1.55;overscroll-behavior-y:contain}
+header{background:var(--card);border-bottom:1px solid var(--line);padding:calc(12px + env(safe-area-inset-top)) 16px 10px;position:sticky;top:0;z-index:30}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:8px;max-width:680px;margin:0 auto}
+.brand-wrap{display:flex;align-items:center;gap:8px}
+.brand{font-size:1.05rem;font-weight:800;color:var(--gd)}
+.badge{background:var(--tint);color:var(--gd);padding:4px 11px;border-radius:99px;font-size:.73rem;font-weight:700;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--g)}.dot.off{background:#e5574a}
+.sub{max-width:680px;margin:4px auto 0;font-size:.78rem;color:var(--mute)}
+#toast{position:fixed;top:calc(68px + env(safe-area-inset-top));left:50%;transform:translateX(-50%) translateY(-16px);width:calc(100% - 28px);max-width:640px;background:var(--gd);color:#fff;border-radius:18px;padding:12px 16px;box-shadow:0 10px 26px rgba(12,77,59,.28);z-index:250;opacity:0;pointer-events:none;transition:.22s ease;display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:.86rem;font-weight:700}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+#toast small{display:block;font-weight:600;color:#c8f2d4;font-size:.76rem;margin-top:2px}
+#toast button{background:rgba(255,255,255,.18);color:#fff;border:0;border-radius:999px;padding:6px 12px;font-size:.76rem;font-weight:700;cursor:pointer;white-space:nowrap}
+main{max-width:680px;margin:0 auto;padding:8px 14px 16px}
+.tab{display:none}.tab.on{display:block}
+.sh{display:flex;justify-content:space-between;align-items:center;margin:16px 2px 10px}
+.sh b{font-size:1.12rem;font-weight:800;color:var(--ink)}
+.sh a{color:var(--g2);font-size:.86rem;font-weight:700;cursor:pointer;text-decoration:none}
+.qa{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.qt{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px 6px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--gd);font-size:.78rem;font-weight:700;cursor:pointer;box-shadow:0 3px 12px rgba(15,40,28,.04);transition:.15s ease;text-align:center}
+.qt:active{transform:scale(.97);background:var(--tint)}
+.qt-ico{width:34px;height:34px;border-radius:12px;background:var(--tint);color:var(--g2);display:flex;align-items:center;justify-content:center}
+.banner{margin-top:16px;border-radius:22px;padding:20px 18px;color:#fff;cursor:pointer;position:relative;overflow:hidden;background:radial-gradient(circle at 14% 25%, rgba(255,255,255,.16) 0 36px, transparent 37px),radial-gradient(circle at 24% 82%, rgba(255,255,255,.14) 0 48px, transparent 49px),linear-gradient(125deg, #2cc04b 0%, #17943a 60%, #107831 100%);box-shadow:0 8px 20px rgba(23,148,58,.22);display:flex;justify-content:space-between;align-items:center;gap:12px}
+.banner:active{transform:scale(.99)}
+.banner-txt{max-width:74%}
+.banner small{display:inline-block;background:rgba(255,255,255,.18);padding:2px 10px;border-radius:99px;font-size:.72rem;font-weight:700;margin-bottom:6px}
+.banner h2{font-size:1.12rem;font-weight:800;line-height:1.45;margin-bottom:8px}
+.banner .cta{font-weight:800;font-size:.88rem;display:inline-flex;align-items:center;gap:4px}
+.banner-badge{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);border-radius:18px;padding:10px 12px;text-align:center;min-width:78px}
+.banner-badge b{display:block;font-size:1.25rem;font-weight:800;line-height:1.1}
+.banner-badge span{font-size:.72rem;opacity:.92}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:14px 16px;box-shadow:0 3px 12px rgba(15,40,28,.04)}
+.stat b{display:block;font-size:1.3rem;font-weight:800;color:var(--gd)}
+.stat span{font-size:.78rem;color:var(--mute)}
+.stat:nth-child(3) b{color:#c98a00}
+.stat:nth-child(4) b{color:var(--g2)}
+.hscroll{display:flex;gap:12px;overflow-x:auto;padding:2px 2px 10px;scrollbar-width:none;overscroll-behavior-x:contain}
+.hscroll::-webkit-scrollbar{display:none}
+.offer-card{flex:0 0 255px;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:14px;box-shadow:0 3px 12px rgba(15,40,28,.04);display:flex;flex-direction:column;justify-content:space-between;gap:10px}
+.offer-card.busy-card{border-color:#cde8d5;background:linear-gradient(180deg,#f6fcf8 0%,#ffffff 100%)}
+.offer-top{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.offer-title{font-size:1rem;font-weight:800;color:var(--ink)}
+.offer-box{background:#f5f7f6;border-radius:14px;padding:9px 11px;font-size:.82rem;color:var(--ink)}
+.offer-price{font-size:1.05rem;font-weight:800;color:var(--g2)}
+.offer-sub{font-size:.76rem;color:var(--mute)}
+.offer-btn{width:100%;background:var(--gd);color:#fff;border:0;height:38px;border-radius:999px;font-size:.86rem;font-weight:700;cursor:pointer}
+.offer-btn.free-btn{background:var(--g2)}
+.offer-btn:active{opacity:.9}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:16px;margin-top:12px;box-shadow:0 3px 12px rgba(15,40,28,.04)}
+h3{font-size:1.04rem;font-weight:800;margin-bottom:10px;color:var(--ink)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fg{margin-bottom:12px}
+label{display:block;font-size:.82rem;font-weight:700;margin-bottom:5px;color:var(--ink)}
+input,select{width:100%;padding:11px 14px;border:1px solid #e1e7e3;border-radius:14px;font-size:.94rem;background:#f7f9f8;color:var(--ink)}
+input:focus,select:focus{outline:2px solid var(--g);outline-offset:0;background:#fff}
+.tot{background:var(--tint);color:var(--gd);padding:12px 14px;border-radius:16px;font-weight:700;font-size:.92rem;margin-bottom:12px}
+.tot div{display:flex;justify-content:space-between}
+.btn{width:100%;background:var(--gd);color:#fff;border:0;height:48px;border-radius:999px;font-size:.98rem;font-weight:700;cursor:pointer}
+.btn:active{opacity:.9;transform:scale(.99)}
+.btn:disabled{opacity:.6;cursor:not-allowed}
+.sm{border:0;padding:7px 13px;border-radius:999px;font-size:.78rem;font-weight:700;cursor:pointer;white-space:nowrap}
+.out{background:#fde5e2;color:var(--clay)}.pay{background:var(--tint);color:var(--gd)}.ext{background:#fdf0c9;color:#7a5600}
+.edit{background:#e3effd;color:#0f4c81}
+.rc{background:#eef1ef;color:var(--ink)}.del{background:#fff;color:var(--clay);border:1px solid #f0b9b3}
+.rooms{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.room{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:14px;cursor:pointer;min-height:104px;box-shadow:0 3px 12px rgba(15,40,28,.04);display:flex;flex-direction:column;justify-content:space-between}
+.room.busy{background:linear-gradient(135deg,#127a3e,var(--gd));border-color:var(--gd);color:#fff}
+.room-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.room-top strong{font-size:1rem;font-weight:800}
+.pill{font-size:.72rem;padding:3px 10px;border-radius:99px;font-weight:700}
+.free{background:var(--tint);color:var(--g2)}.busy-p{background:#ffe29a;color:#5a4000}
+.room.busy .meta{color:#d5f2e1}
+.item{border-bottom:1px solid var(--line);padding:12px 0}.item:last-child{border:0}
+.item-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.meta{font-size:.8rem;color:var(--mute)}
+.tag{display:inline-block;margin-top:4px;margin-left:4px;background:var(--tint);color:var(--gd);padding:2px 10px;border-radius:99px;font-size:.75rem;font-weight:700}
+.tag.warn{background:#fdf0c9;color:#7a5600}
+.tag.late{background:#fde5e2;color:var(--clay)}
+.acts{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.empty{color:var(--mute);font-size:.88rem}
+nav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding:6px 4px calc(8px + env(safe-area-inset-bottom));z-index:50;box-shadow:0 -4px 16px rgba(0,0,0,.03)}
+nav button{background:none;border:0;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--mute);font-size:.72rem;font-weight:700;padding:2px;cursor:pointer}
+nav button i{font-style:normal;font-size:1.15rem;padding:3px 18px;border-radius:999px;line-height:1.35;transition:.15s}
+nav button.on{color:var(--g2)}
+nav button.on i{background:var(--tint);color:var(--g2)}
+#login{position:fixed;inset:0;background:linear-gradient(160deg,#2cc04b 0%,#12783a 100%);display:flex;align-items:center;justify-content:center;z-index:200;padding:20px}
+.lbox{background:#fff;border-radius:26px;padding:26px 22px;width:100%;max-width:360px;display:grid;gap:12px;text-align:center;box-shadow:0 12px 32px rgba(0,0,0,.15)}
+.lbox h2{color:var(--gd);font-size:1.45rem;font-weight:800}.lbox p{color:var(--mute);font-size:.85rem}
+.toggle-auth{background:none;border:0;color:var(--gd);font-weight:700;font-size:.85rem;cursor:pointer;padding-top:2px}
+.err{color:#b91c1c;font-size:.84rem;min-height:1em}
+.r{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line);font-size:.88rem}.r.b{font-weight:800;color:var(--gd)}
+.tb{width:100%;border-collapse:collapse;font-size:.82rem;margin:8px 0}.tb td,.tb th{border-bottom:1px solid var(--line);padding:6px 4px;text-align:right}
+.bell{position:relative;background:var(--tint);border:0;width:38px;height:38px;border-radius:50%;font-size:1.05rem;cursor:pointer}
+.bn{position:absolute;top:-4px;right:-4px;background:#e5574a;color:#fff;border-radius:99px;font-size:.66rem;font-weight:800;min-width:18px;height:18px;display:flex;align-items:center;justify-content:center;padding:0 4px}
+.unread{background:var(--tint);border-radius:12px;padding-inline:10px}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:300;align-items:center;justify-content:center;padding:16px;overscroll-behavior:contain}
+.modal-overlay.open{display:flex}
+.pm-box{background:#fff;border-radius:22px;padding:18px;width:100%;max-width:460px;max-height:88vh;overflow:auto;color:#111;overscroll-behavior:contain}
+.pm-actions{display:flex;gap:8px;margin-top:14px}
+@media print{body > *:not(#printModal){display:none !important}#printModal{position:static;background:none;padding:0;display:block !important}.pm-box{box-shadow:none;max-height:none;max-width:100%;padding:0}.pm-actions{display:none !important}}
+@media(max-width:440px){.row{grid-template-columns:1fr;gap:0}.qa{gap:7px}.qt{font-size:.72rem;padding:12px 4px;border-radius:18px}}
+</style>
+</head>
+<body>
+
+<div id="login">
+  <form id="loginForm" class="lbox">
+    <h2 id="authTitle">غابة الراحة</h2>
+    <p id="authSub">سجّل الدخول للمتابعة</p>
+    <input id="lmail" type="text" placeholder="اسم المستخدم" required autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false">
+    <input id="lpass" type="password" placeholder="كلمة السر (6 أحرف فأكثر)" required autocomplete="current-password">
+    <div id="loginErr" class="err"></div>
+    <button id="authSubmit" class="btn" type="submit">دخول</button>
+    <button type="button" id="toggleAuthMode" class="toggle-auth">إنشاء حساب جديد</button>
+  </form>
+</div>
+
+<div id="toast" role="status" aria-live="polite">
+  <div>
+    <span id="toastTitle">حجز جديد</span>
+    <small id="toastSub"></small>
+  </div>
+  <button type="button" id="toastBtn" onclick="toastGo()">عرض</button>
+</div>
+
+<div id="printModal" class="modal-overlay" onclick="if(event.target===this)closePrint()">
+  <div class="pm-box">
+    <div id="pmBody"></div>
+    <div class="pm-actions">
+      <button class="btn" onclick="window.print()">طباعة</button>
+      <button class="btn" style="background:#6c7883;max-width:110px" onclick="closePrint()">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<div id="notifModal" class="modal-overlay" onclick="if(event.target===this)closeNotifs()">
+  <div class="pm-box">
+    <h3>الإشعارات</h3>
+    <div id="notifList" class="empty">–</div>
+    <div class="pm-actions">
+      <button class="btn" style="max-width:160px" onclick="enableDeviceNotif()">تفعيل إشعارات الجهاز</button>
+      <button class="btn" style="background:#6c7883" onclick="closeNotifs()">إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<div id="editModal" class="modal-overlay" onclick="if(event.target===this)closeEdit()">
+  <div class="pm-box">
+    <h3 id="editTitle">تعديل بيانات الحجز</h3>
+    <form id="editForm">
+      <input type="hidden" id="editKey">
+      <div class="fg"><label for="eGuest">الاسم واللقب</label><input id="eGuest" required></div>
+      <div class="row">
+        <div class="fg"><label for="ePhone">الهاتف</label><input id="ePhone" type="tel" required></div>
+        <div class="fg"><label for="eIdno">رقم بطاقة الهوية / الجواز</label><input id="eIdno"></div>
+      </div>
+      <div class="row">
+        <div class="fg"><label for="ePrice">سعر الليلة (دج)</label><input id="ePrice" type="number" min="0" step="100" required></div>
+        <div class="fg"><label for="eNights">عدد الليالي</label><input id="eNights" type="number" min="1" required></div>
+      </div>
+      <div class="fg"><label for="eAddr">العنوان / ملاحظة</label><input id="eAddr"></div>
+      <div class="tot">
+        <div><span>الإجمالي الجديد</span><span id="eTotal">0 دج</span></div>
+        <div><span>المتبقي الجديد</span><span id="eRest">0 دج</span></div>
+      </div>
+      <div class="pm-actions">
+        <button id="eSaveBtn" class="btn" type="submit">حفظ التعديلات</button>
+        <button class="btn" type="button" style="background:#6c7883;max-width:110px" onclick="closeEdit()">إلغاء</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<header>
+  <div class="bar">
+    <div class="brand-wrap">
+      <img id="hLogo" alt="" onerror="this.style.display='none'" style="display:none;height:32px;border-radius:8px;background:#fff;padding:2px">
+      <div class="brand">Le Jardin de Détente · غابة الراحة</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button id="bell" class="bell" onclick="openNotifs()" aria-label="الإشعارات">🔔<span id="bellN" class="bn" style="display:none">0</span></button>
+      <div class="badge"><span id="dot" class="dot"></span><span id="sync">متصل</span></div>
+    </div>
+  </div>
+  <div class="sub">10 وحدات — الدخول 13:00 | الخروج 10:00</div>
+</header>
+
+<main>
+  <section id="tab-home" class="tab on">
+    <div class="sh"><b>عمليات سريعة</b></div>
+    <div class="qa">
+      <div class="qt" onclick="go('bookings')">
+        <div class="qt-ico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></div>
+        حجز جديد
+      </div>
+      <div class="qt" onclick="go('rooms')">
+        <div class="qt-ico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div>
+        الوحدات
+      </div>
+      <div class="qt" onclick="go('history')">
+        <div class="qt-ico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h6M9 16h6M9 8h6M5 4h14a1 1 0 0 1 1 1v15l-3-2-3 2-3-2-3 2-3-2V5a1 1 0 0 1 1-1z"/></svg></div>
+        التقارير
+      </div>
+      <div class="qt" onclick="go('more')">
+        <div class="qt-ico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06-.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+        الخدمات
+      </div>
+    </div>
+
+    <div class="banner" onclick="go('rooms')">
+      <div class="banner-txt">
+        <small>غابة الراحة · الاستقبال</small>
+        <h2 id="bnSub">جاري تحميل حالة الوحدات…</h2>
+        <div class="cta">إدارة الوحدات الآن ««</div>
+      </div>
+      <div class="banner-badge">
+        <b id="bnFreeNum">10</b>
+        <span>وحدة متاحة</span>
+      </div>
+    </div>
+
+    <div class="sh"><b>حالة الوحدات السريعة</b><a onclick="go('rooms')">المزيد</a></div>
+    <div id="homeOffers" class="hscroll"></div>
+
+    <div class="sh"><b>ملخص اليوم</b></div>
+    <div class="stats">
+      <div class="stat"><b id="sBusy">–</b><span>وحدات مشغولة</span></div>
+      <div class="stat"><b id="sFree">–</b><span>وحدات متاحة</span></div>
+      <div class="stat"><b id="sRem">–</b><span>مبالغ متبقية على النزلاء</span></div>
+      <div class="stat"><b id="sMonth">–</b><span>مداخيل هذا الشهر</span></div>
+    </div>
+
+    <div class="card">
+      <h3>يخرجون اليوم</h3>
+      <div id="dueList" class="empty">–</div>
+    </div>
+  </section>
+
+  <section id="tab-bookings" class="tab">
+    <div class="card">
+      <h3>تسجيل وصول جديد</h3>
+      <form id="form">
+        <div class="fg"><label for="staff">موظف الاستقبال</label><input id="staff" required></div>
+        <div class="fg"><label for="guest">الاسم واللقب</label><input id="guest" required></div>
+        <div class="row">
+          <div class="fg"><label for="phone">الهاتف</label><input id="phone" type="tel" required></div>
+          <div class="fg"><label for="room">الوحدة</label><select id="room" required></select></div>
+        </div>
+        <div class="row">
+          <div class="fg"><label for="price">سعر الليلة (دج)</label><input id="price" type="number" min="0" step="100" required></div>
+          <div class="fg"><label for="nights">عدد الليالي</label><input id="nights" type="number" min="1" value="1" required></div>
+        </div>
+        <div class="row">
+          <div class="fg"><label for="deposit">العربون المدفوع (دج)</label><input id="deposit" type="number" min="0" step="100" value="0"></div>
+          <div class="fg"><label for="idno">رقم بطاقة الهوية / الجواز</label><input id="idno"></div>
+        </div>
+        <div class="row">
+          <div class="fg"><label for="nat">الجنسية</label><input id="nat" value="جزائري"></div>
+          <div class="fg"><label for="birth">تاريخ الميلاد</label><input id="birth" type="date"></div>
+        </div>
+        <div class="fg"><label for="addr">العنوان</label><input id="addr"></div>
+        <div class="tot">
+          <div><span>الإجمالي</span><span id="total">0 دج</span></div>
+          <div><span>المتبقي</span><span id="rest">0 دج</span></div>
+        </div>
+        <button id="saveBtn" class="btn" type="submit">حفظ الحجز</button>
+      </form>
+    </div>
+    <div class="card">
+      <h3>النزلاء الحاليون</h3>
+      <button class="btn" style="margin-bottom:12px; background:var(--g2);" onclick="exportData('bookings')">📥 تصدير الحجوزات الحالية (Excel)</button>
+      <div id="list" class="empty">–</div>
+    </div>
+  </section>
+
+  <section id="tab-rooms" class="tab">
+    <div class="sh"><b>حالة الوحدات (10)</b></div>
+    <div id="grid" class="rooms"></div>
+  </section>
+
+  <section id="tab-history" class="tab">
+    <div class="card">
+      <h3>التقرير اليومي</h3>
+      <div class="fg"><label for="df">اليوم</label><input id="df" type="date"></div>
+      <div id="day"></div>
+      <button class="btn" style="margin-top:10px" onclick="printDay()">طباعة التقرير اليومي</button>
+    </div>
+    <div class="card">
+      <h3>التقرير</h3>
+      <div class="row">
+        <div class="fg"><label for="rf">من</label><input id="rf" type="date"></div>
+        <div class="fg"><label for="rt">إلى</label><input id="rt" type="date"></div>
+      </div>
+      <div id="rep"></div>
+      <button class="btn" style="margin-top:10px" onclick="printReport()">طباعة التقرير</button>
+    </div>
+    <div class="card">
+      <h3>سجل الخروج</h3>
+      <div class="fg"><label for="q">بحث بالاسم أو الهاتف</label><input id="q" placeholder="ابحث…"></div>
+      <button class="btn" style="margin-bottom:12px; background:var(--g2);" onclick="exportData('history')">📥 تصدير سجل الخروج (Excel)</button>
+      <div id="hist" class="empty">–</div>
+    </div>
+  </section>
+
+  <section id="tab-more" class="tab">
+    <div class="card">
+      <h3>الإشعارات داخل التطبيق</h3>
+      <p class="meta" style="margin-bottom:10px">عند أي حجز أو دفعة أو خروج من هاتف آخر يظهر تنبيه فوري مع صوت واهتزاز، وتتجمع الإشعارات في 🔔 أعلى الصفحة.</p>
+      <div class="r"><span>إشعارات الجهاز</span><span id="nState">–</span></div>
+      <div class="acts" style="margin-top:10px">
+        <button class="sm pay" onclick="enableDeviceNotif()">تفعيل إشعارات الجهاز</button>
+        <button class="sm rc" id="sndBtn" onclick="toggleSound()">الصوت</button>
+        <button class="sm ext" onclick="testNotif()">تجربة إشعار</button>
+      </div>
+    </div>
+    <div class="card">
+      <h3>إشعارات تصل والتطبيق مغلق</h3>
+      <p class="meta" style="margin-bottom:10px">تظهر في شريط إشعارات الهاتف مثل أي تطبيق، حتى لو كان هذا التطبيق مغلقاً.</p>
+      <div class="fg"><label for="ntopic">رمز الإشعارات</label><input id="ntopic" readonly placeholder="لم يُنشأ بعد"></div>
+      <button class="btn" onclick="createNtfy()">إنشاء رمز الإشعارات</button>
+      <div class="acts" style="margin-top:10px">
+        <button class="sm rc" onclick="copyNtfy()">نسخ الرمز</button>
+        <button class="sm edit" onclick="shareNtfy()">مشاركة الرابط</button>
+        <button class="sm pay" onclick="testNtfy()">إشعار تجريبي</button>
+      </div>
+      <p class="meta" style="margin-top:10px">على كل هاتف: ثبّت تطبيق <b>ntfy</b> من Google Play ← اضغط + ← الصق الرمز ← اشترك. ثم اسمح بإشعاراته من إعدادات الهاتف.</p>
+    </div>
+    <div class="card">
+      <h3>اسم الموظف الافتراضي</h3>
+      <div class="fg"><input id="defStaff" placeholder="أدخل الاسم"></div>
+      <button class="btn" onclick="saveStaff()">حفظ</button>
+    </div>
+    <div class="card">
+      <h3>ملاحظات الصيانة والخدمات</h3>
+      <div class="fg"><input id="note" placeholder="مثال: تجهيز الوحدة 4 قبل 13:00"></div>
+      <button class="btn" onclick="addNote()">إضافة ملاحظة</button>
+      <div id="notes" style="margin-top:12px"></div>
+    </div>
+    <div class="card">
+      <h3>شعار الفندق</h3>
+      <p class="meta" style="margin-bottom:8px">يظهر في أعلى التطبيق وعلى الوصل والتقارير.</p>
+      <img id="logoPrev" alt="" style="display:none;max-height:80px;margin-bottom:10px">
+      <input id="logoFile" type="file" accept="image/*">
+      <button class="btn" style="margin-top:10px;background:#6c7883" onclick="removeLogo()">إزالة الشعار</button>
+    </div>
+    <div class="card">
+      <button class="btn" style="background:#991b1b" onclick="logout()">تسجيل الخروج</button>
+    </div>
+  </section>
+</main>
+
+<nav>
+  <button class="on" data-t="home"><i>⌂</i>الرئيسية</button>
+  <button data-t="bookings"><i>✎</i>الحجوزات</button>
+  <button data-t="rooms"><i>▦</i>الوحدات</button>
+  <button data-t="history"><i>☰</i>السجل</button>
+  <button data-t="more"><i>⚙</i>المزيد</button>
+</nav>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyAqe6ojSlvqw-AsUkU1PgKYPfCgzhrIh6s",
+  authDomain:"ghabat-al-raha-hotel.firebaseapp.com",
+  databaseURL:"https://ghabat-al-raha-hotel-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId:"ghabat-al-raha-hotel",
+  storageBucket:"ghabat-al-raha-hotel.firebasestorage.app",
+  messagingSenderId:"329654971367",
+  appId:"1:329654971367:web:71d2071f0f6f7b5a6a2b42"
+});
+const db = firebase.database();
+const auth = firebase.auth();
+const N = 10, $ = id => document.getElementById(id);
+const fmt = n => (Number(n)||0).toLocaleString("fr-DZ") + " دج";
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const makeBookingId = () => "bk_" + Date.now().toString(36) + "_" + Math.random().toString(36).slice(2, 7);
+let bookings = {}, history = {}, payments = {}, logo = "";
+let toastTimer = null, currentAuthUid = null, started = false, swRegistration = null;
+const activeRefs = [];
+
+function requireAuth(){
+  if (!auth.currentUser || !currentAuthUid) {
+    alert("يجب تسجيل الدخول أولاً لتنفيذ هذه العملية.");
+    return false;
+  }
+  return true;
+}
+
+function go(t){
+  document.querySelectorAll(".tab").forEach(p => p.classList.toggle("on", p.id === "tab-" + t));
+  document.querySelectorAll("nav button").forEach(b => b.classList.toggle("on", b.dataset.t === t));
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+document.querySelectorAll("nav button").forEach(b => b.onclick = () => go(b.dataset.t));
+
+for (let i = 1; i <= N; i++) $("room").add(new Option("وحدة رقم " + i, i));
+
+function quickBookRoom(roomNum){
+  $("room").value = roomNum;
+  go("bookings");
+  $("guest").focus();
+}
+
+const soundOn = () => localStorage.getItem("notifSound") !== "off";
+const baseTitle = document.title;
+let ntfyTopic = "";
+let notifs = {}, notifReady = false;
+if (!localStorage.getItem("notifSeen")) localStorage.setItem("notifSeen", new Date().toISOString());
+
+function pushNtfy(title, message){
+  if (!ntfyTopic) return;
+  fetch("https://ntfy.sh/", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ topic: ntfyTopic, title, message: message || "—", priority: 4, tags: ["house"] })
+  }).catch(() => {});
+}
+
+function createNtfy(){
+  if (!requireAuth()) return;
+  if (ntfyTopic && !confirm("يوجد رمز بالفعل. إنشاء رمز جديد يوقف الإشعارات على الهواتف المشتركة بالرمز القديم. متابعة؟")) return;
+  const a = "abcdefghijklmnopqrstuvwxyz0123456789";
+  const r = crypto.getRandomValues(new Uint8Array(18));
+  const t = "jardin-" + Array.from(r, x => a[x % 36]).join("");
+  db.ref("settings/ntfyTopic").set(t).then(() => alert("تم إنشاء الرمز. ثبّت تطبيق ntfy على كل هاتف واشترك به.")).catch(() => alert("تعذر الحفظ. تحقق من صلاحيات الحساب."));
+}
+function copyNtfy(){
+  if (!ntfyTopic) return alert("أنشئ الرمز أولاً.");
+  if (navigator.clipboard) navigator.clipboard.writeText(ntfyTopic).then(() => alert("تم نسخ الرمز.")).catch(() => $("ntopic").select());
+  else { $("ntopic").select(); document.execCommand("copy"); alert("تم نسخ الرمز."); }
+}
+function shareNtfy(){
+  if (!ntfyTopic) return alert("أنشئ الرمز أولاً.");
+  const msg = "رمز إشعارات غابة الراحة في ntfy: " + ntfyTopic + " (https://ntfy.sh/" + ntfyTopic + ")";
+  if (navigator.share) navigator.share({ title: "إشعارات غابة الراحة", text: msg }).catch(() => {});
+  else copyNtfy();
+}
+function testNtfy(){
+  if (!ntfyTopic) return alert("أنشئ الرمز أولاً.");
+  pushNtfy("اختبار الإشعارات", "إشعار تجريبي من تطبيق غابة الراحة.");
+  alert("تم الإرسال. يصل خلال ثوانٍ إلى الهواتف المشتركة.");
+}
+
+function notify(type, title, body, safe, bookingId = null){
+  if (!requireAuth()) return;
+  pushNtfy(title, safe);
+  db.ref("notifications").push({
+    type, title, body,
+    bookingId: bookingId || null,
+    time: new Date().toISOString(),
+    by: (localStorage.getItem("staffName") || "-"),
+    uid: currentAuthUid
+  }).catch(() => {});
+}
+const sortedNotifs = () => Object.entries(notifs).map(([k, n]) => ({ ...n, _k: k })).sort((a, b) => (b.time || "").localeCompare(a.time || ""));
+const unreadList = () => sortedNotifs().filter(n => n.time > (localStorage.getItem("notifSeen") || "") && n.uid !== currentAuthUid);
+
+function updateBell(){
+  const n = unreadList().length;
+  $("bellN").style.display = n ? "flex" : "none";
+  $("bellN").textContent = n > 99 ? "99+" : n;
+  document.title = (n ? "(" + n + ") " : "") + baseTitle;
+}
+
+let toastAct = null;
+function showToast(title, sub, label, act){
+  $("toastTitle").textContent = title;
+  $("toastSub").textContent = sub || "";
+  $("toastBtn").textContent = label || "عرض";
+  toastAct = act || null;
+  $("toast").classList.add("show");
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(hideToast, act ? 12000 : 6000);
+}
+function toastGo(){ const a = toastAct; hideToast(); toastAct = null; if (a) a(); else openNotifs(); }
+function shareWA(text){ window.open("https://wa.me/?text=" + encodeURIComponent(text), "_blank"); }
+function waNotif(k){
+  const n = notifs[k]; if (!n) return;
+  shareWA(`${n.title}\n${n.body}\nالموظف: ${n.by || "-"} · ${dtstr(n.time)}\nغابة الراحة`);
+}
+function hideToast(){
+  $("toast").classList.remove("show");
+  if (toastTimer) clearTimeout(toastTimer);
+}
+
+function playBeep(){
+  if (!soundOn()) return;
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return;
+    const ctx = new Ctx(), osc = ctx.createOscillator(), gain = ctx.createGain();
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(740, ctx.currentTime);
+    gain.gain.setValueAtTime(0.1, ctx.currentTime);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(); osc.stop(ctx.currentTime + 0.2);
+  } catch {}
+}
+
+async function getSwReg(){
+  if (swRegistration) return swRegistration;
+  if (!("serviceWorker" in navigator)) return null;
+  try {
+    swRegistration = await navigator.serviceWorker.getRegistration();
+    return swRegistration;
+  } catch {
+    return null;
+  }
+}
+
+async function deviceNotify(n){
+  try {
+    if (!("Notification" in window) || Notification.permission !== "granted") return;
+    const opts = {
+      body: n.body || "",
+      tag: "jardin-" + (n.time || Date.now()),
+      dir: "rtl",
+      lang: "ar",
+      renotify: true
+    };
+    const reg = await getSwReg();
+    if (reg && reg.showNotification) await reg.showNotification(n.title, opts);
+    else new Notification(n.title, opts);
+  } catch {}
+}
+
+function alertNotif(n){
+  showToast(n.title, n.body);
+  playBeep();
+  try { navigator.vibrate && navigator.vibrate([150, 80, 150]); } catch {}
+  if (document.hidden || !document.hasFocus()) deviceNotify(n);
+}
+
+function attachNotifListener(){
+  const ref = db.ref("notifications").limitToLast(50);
+  activeRefs.push(ref);
+  ref.once("value", s => {
+    if (!currentAuthUid) return;
+    notifs = s.val() || {}; notifReady = true; updateBell();
+    const u = unreadList();
+    if (u.length) showToast("لديك " + u.length + " إشعارات جديدة", u[0].title);
+  });
+  ref.on("child_added", snap => {
+    if (!currentAuthUid) return;
+    const n = snap.val(); if (!n) return;
+    notifs[snap.key] = n;
+    if (!notifReady) return;
+    updateBell();
+    if (n.uid && n.uid === currentAuthUid) return;
+    alertNotif(n);
+  });
+}
+
+const NICON = { booking: "🛎️", payment: "💰", checkout: "🚪" };
+function openNotifs(){
+  const seen = localStorage.getItem("notifSeen") || "";
+  const items = sortedNotifs().slice(0, 40);
+  $("notifList").innerHTML = items.length ? items.map(n => `<div class="item ${n.time > seen && n.uid !== currentAuthUid ? "unread" : ""}">
+    <strong>${NICON[n.type] || "🔔"} ${esc(n.title)}</strong>
+    <div class="meta">${esc(n.body)}</div>
+    <div class="meta">${esc(n.by || "-")} · ${dtstr(n.time)}</div>
+    <div class="acts"><button class="sm pay" onclick="waNotif('${n._k}')">إرسال إلى واتساب</button></div></div>`).join("") : "لا توجد إشعارات بعد.";
+  $("notifModal").classList.add("open");
+  localStorage.setItem("notifSeen", new Date().toISOString());
+  updateBell();
+}
+function closeNotifs(){ $("notifModal").classList.remove("open"); }
+
+function updateNotifState(){
+  $("nState").textContent = !("Notification" in window) ? "غير مدعومة"
+    : Notification.permission === "granted" ? "مفعّلة"
+    : Notification.permission === "denied" ? "محظورة — فعّلها من إعدادات الموقع/التطبيق" : "غير مفعّلة";
+  $("sndBtn").textContent = soundOn() ? "الصوت: مفعّل" : "الصوت: متوقف";
+}
+function enableDeviceNotif(){
+  if (!("Notification" in window)) return alert("هذا المتصفح لا يدعم إشعارات الجهاز.");
+  Notification.requestPermission().then(p => {
+    updateNotifState();
+    if (p === "granted") {
+      getSwReg().then(() => new Notification("تم تفعيل الإشعارات", { body: "ستصلك تنبيهات الحجوزات على هذا الهاتف.", dir: "rtl", lang: "ar" }));
+    } else if (p === "denied") {
+      alert("الإشعارات محظورة. افتح إعدادات الموقع في المتصفح أو إعدادات التطبيق على أندرويد واسمح بالإشعارات.");
+    }
+  });
+}
+function toggleSound(){
+  localStorage.setItem("notifSound", soundOn() ? "off" : "on");
+  updateNotifState();
+}
+function testNotif(){
+  showToast("إشعار تجريبي", "هكذا تظهر التنبيهات على هذا الهاتف.");
+  playBeep();
+  try { navigator.vibrate && navigator.vibrate([150, 80, 150]); } catch {}
+  if ("Notification" in window && Notification.permission === "granted") {
+    new Notification("إشعار تجريبي", { body: "هكذا تظهر التنبيهات على هذا الهاتف.", dir: "rtl", lang: "ar" });
+  }
+}
+updateNotifState();
+
+document.addEventListener("keydown", e => {
+  if (e.key !== "Escape") return;
+  closePrint();
+  closeNotifs();
+  closeEdit();
+});
+
+function calc(){
+  const t = (+$("price").value || 0) * Math.max(1, +$("nights").value || 1);
+  $("total").textContent = fmt(t);
+  $("rest").textContent = fmt(Math.max(0, t - (+$("deposit").value || 0)));
+  return t;
+}
+["price","nights","deposit"].forEach(id => $(id).addEventListener("input", calc));
+
+const saved = localStorage.getItem("staffName") || "";
+$("staff").value = saved; $("defStaff").value = saved;
+function saveStaff(){
+  const v = $("defStaff").value.trim();
+  localStorage.setItem("staffName", v); $("staff").value = v;
+  alert("تم الحفظ.");
+}
+
+db.ref(".info/connected").on("value", s => {
+  const on = s.val() === true;
+  $("dot").classList.toggle("off", !on);
+  $("sync").textContent = on ? "متصل" : "غير متصل";
+});
+
+const total = b => b.totalAmount ?? (b.nightPrice||0) * (b.nightsCount||1);
+const rest = b => Math.max(0, total(b) - (b.paid||0));
+function outDate(b){
+  const d = new Date(b.checkInTime); d.setDate(d.getDate() + (b.nightsCount||1)); return d;
+}
+function expectedOutDateTime(b){
+  const d = outDate(b);
+  d.setHours(10, 0, 0, 0);
+  return d;
+}
+const isOverdueCheckout = (b, now = new Date()) => now > expectedOutDateTime(b);
+const dstr = d => d.toLocaleDateString("fr-DZ");
+const dtstr = (d, fixedHour) => {
+  const dt = new Date(d);
+  if (isNaN(dt)) return "-";
+  if (typeof fixedHour === "number") dt.setHours(fixedHour, 0, 0, 0);
+  const hh = String(dt.getHours()).padStart(2, "0");
+  const mm = String(dt.getMinutes()).padStart(2, "0");
+  return `${dt.toLocaleDateString("fr-DZ")} · ${hh}:${mm}`;
+};
+const sameDay = (a, b) => a.toDateString() === b.toDateString();
+
+$("form").addEventListener("submit", async e => {
+  e.preventDefault();
+  if ($("saveBtn").disabled || !requireAuth()) return;
+  const room = +$("room").value;
+  if (bookings["room_" + room]) return alert("الوحدة " + room + " مشغولة حالياً. اختر وحدة أخرى.");
+  const t = calc(), dep = Math.min(+$("deposit").value || 0, t), staff = $("staff").value.trim();
+  localStorage.setItem("staffName", staff);
+  const bookingId = makeBookingId();
+  const data = {
+    bookingId,
+    staffName: staff, guestName: $("guest").value.trim(), phoneNumber: $("phone").value.trim(),
+    idNumber: $("idno").value.trim(), nationality: $("nat").value.trim(), birthDate: $("birth").value,
+    address: $("addr").value.trim(), nightPrice: +$("price").value, nightsCount: Math.max(1, +$("nights").value || 1),
+    totalAmount: t, paid: dep, roomNumber: room, checkInTime: new Date().toISOString(),
+    createdByUid: currentAuthUid
+  };
+
+  const origLabel = $("saveBtn").textContent;
+  $("saveBtn").disabled = true;
+  $("saveBtn").textContent = "جاري الحفظ...";
+  try {
+    const tx = await db.ref("bookings/room_" + room).transaction(cur => cur ? undefined : data);
+    if (!tx.committed) {
+      alert("تم حجز الوحدة " + room + " للتو من جهاز آخر. اختر وحدة متاحة.");
+      return;
+    }
+    if (dep > 0) await logPay(dep, data, staff);
+    notify("booking", "حجز جديد — وحدة " + room, `${data.guestName} · ${data.nightsCount} ليلة · ${fmt(data.totalAmount)}`, `${data.nightsCount} ليلة · ${fmt(data.totalAmount)} · الموظف: ${staff}`, bookingId);
+    e.target.reset(); $("staff").value = staff; $("nat").value = "جزائري"; $("nights").value = 1; $("deposit").value = 0; calc();
+    go("rooms");
+    const waText = `🛎️ حجز جديد — وحدة ${room}\nالنزيل: ${data.guestName}\n${data.nightsCount} ليلة · ${fmt(data.totalAmount)}\nالموظف: ${staff}\nغابة الراحة`;
+    showToast("تم حفظ الحجز — وحدة " + room, "اضغط لإرسال التفاصيل إلى مجموعة واتساب", "واتساب", () => shareWA(waText));
+  } catch {
+    alert("تعذر الحفظ. تحقق من الاتصال وقواعد Firebase.");
+  } finally {
+    $("saveBtn").disabled = false;
+    $("saveBtn").textContent = origLabel;
+  }
+});
+
+function calcEdit(){
+  const key = $("editKey").value;
+  const b = bookings[key];
+  const paid = b ? (Number(b.paid) || 0) : 0;
+  const t = (+$("ePrice").value || 0) * Math.max(1, +$("eNights").value || 1);
+  $("eTotal").textContent = fmt(t);
+  $("eRest").textContent = fmt(Math.max(0, t - paid));
+  return t;
+}
+["ePrice", "eNights"].forEach(id => $(id).addEventListener("input", calcEdit));
+
+function openEdit(key){
+  const b = bookings[key]; if (!b) return;
+  $("editKey").value = key;
+  $("editTitle").textContent = `تعديل حجز الوحدة ${b.roomNumber}`;
+  $("eGuest").value = b.guestName || "";
+  $("ePhone").value = b.phoneNumber || "";
+  $("eIdno").value = b.idNumber || "";
+  $("ePrice").value = b.nightPrice ?? 0;
+  $("eNights").value = b.nightsCount || 1;
+  $("eAddr").value = b.address || "";
+  calcEdit();
+  $("editModal").classList.add("open");
+}
+function closeEdit(){ $("editModal").classList.remove("open"); }
+
+$("editForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  if ($("eSaveBtn").disabled || !requireAuth()) return;
+  const key = $("editKey").value;
+  const b = bookings[key]; if (!b) return;
+  const nights = Math.max(1, +$("eNights").value || 1);
+  const nightPrice = Math.max(0, +$("ePrice").value || 0);
+  const t = nights * nightPrice;
+  const currentPaid = Number(b.paid) || 0;
+  let nextPaid = currentPaid;
+
+  if (t < currentPaid) {
+    const keepPaid = confirm(`الإجمالي الجديد (${fmt(t)}) أقل من المبلغ المدفوع حالياً (${fmt(currentPaid)}).\nاضغط "موافق" للإبقاء على المدفوع كما هو، أو "إلغاء" لضبط المدفوع مساوياً للإجمالي الجديد.`);
+    if (!keepPaid) nextPaid = t;
+  }
+
+  const updates = {
+    guestName: $("eGuest").value.trim(),
+    phoneNumber: $("ePhone").value.trim(),
+    idNumber: $("eIdno").value.trim(),
+    nightPrice,
+    nightsCount: nights,
+    totalAmount: t,
+    paid: nextPaid,
+    address: $("eAddr").value.trim(),
+    updatedAt: new Date().toISOString(),
+    updatedByUid: currentAuthUid
+  };
+  $("eSaveBtn").disabled = true;
+  $("eSaveBtn").textContent = "جاري التحديث...";
+  try {
+    await db.ref("bookings/" + key).update(updates);
+    if (t !== total(b) || nights !== (b.nightsCount || 1)) {
+      notify("payment", "تعديل حجز — وحدة " + b.roomNumber, `${updates.guestName} · ${nights} ليلة · إجمالي ${fmt(t)}`, `${nights} ليلة · إجمالي ${fmt(t)}`, b.bookingId || null);
+    }
+    closeEdit();
+  } catch {
+    alert("تعذر حفظ التعديلات.");
+  } finally {
+    $("eSaveBtn").disabled = false;
+    $("eSaveBtn").textContent = "حفظ التعديلات";
+  }
+});
+
+async function pay(key){
+  if (!requireAuth()) return;
+  if (window._paying) return;
+  window._paying = true;
+  try {
+    const b = bookings[key]; if (!b) return;
+    const currentRest = rest(b);
+    if (currentRest <= 0) return;
+    const v = prompt("المبلغ المتبقي " + fmt(currentRest) + "\nأدخل المبلغ المدفوع الآن:", currentRest);
+    const n = Number(v); if (!v || !(n > 0)) return;
+    const amt = Math.min(currentRest, n);
+    const currentStaff = ($("staff").value || localStorage.getItem("staffName") || b.staffName || "-").trim() || "-";
+    const tx = await db.ref("bookings/" + key + "/paid").transaction(cur => (Number(cur) || 0) + amt);
+    if (!tx.committed) return alert("تعذر تسجيل الدفعة.");
+    await logPay(amt, b, currentStaff);
+    notify("payment", "دفعة — وحدة " + b.roomNumber, b.guestName + " · " + fmt(amt), fmt(amt) + " · الموظف: " + currentStaff, b.bookingId || null);
+  } finally {
+    window._paying = false;
+  }
+}
+
+async function extend(key){
+  if (!requireAuth()) return;
+  const b = bookings[key]; if (!b) return;
+  const v = parseInt(prompt("عدد الليالي الإضافية:", "1"), 10); if (!(v > 0)) return;
+  const nights = (b.nightsCount||1) + v;
+  const t = nights * (b.nightPrice||0);
+  await db.ref("bookings/" + key).update({ nightsCount: nights, totalAmount: t, updatedAt: new Date().toISOString(), updatedByUid: currentAuthUid });
+  notify("payment", "تمديد إقامة — وحدة " + b.roomNumber, `${b.guestName} · +${v} ليلة · إجمالي ${fmt(t)}`, `+${v} ليلة · إجمالي ${fmt(t)}`, b.bookingId || null);
+}
+
+async function checkout(key){
+  if (!requireAuth()) return;
+  if (window._checkingOut) return;
+  const b = bookings[key]; if (!b) return;
+  if (rest(b) > 0 && !confirm("متبقي " + fmt(rest(b)) + " غير مدفوع. هل تريد تسجيل الخروج؟")) return;
+  if (!confirm("تأكيد خروج " + b.guestName + " وتحرير الوحدة؟")) return;
+  window._checkingOut = true;
+  try {
+    const histRef = db.ref("history").push();
+    const updates = {};
+    updates["history/" + histRef.key] = {
+      ...b,
+      checkOutTime: new Date().toISOString(),
+      checkedOutByUid: currentAuthUid
+    };
+    updates["bookings/" + key] = null;
+    await db.ref().update(updates);
+    notify("checkout", "خروج — وحدة " + b.roomNumber, b.guestName + (rest(b) ? " · متبقي " + fmt(rest(b)) : ""), "الموظف: " + (localStorage.getItem("staffName") || "-"), b.bookingId || null);
+  } catch {
+    alert("تعذر تسجيل الخروج.");
+  } finally {
+    window._checkingOut = false;
+  }
+}
+
+function guestCard(key, b, opts = {}){
+  const r = rest(b);
+  const out = outDate(b);
+  const overdue = opts.showOverdue && isOverdueCheckout(b);
+  return `<div class="item">
+    <div class="item-top"><div>
+      <strong>وحدة ${esc(b.roomNumber)}</strong> — ${esc(b.guestName)}
+      ${overdue ? `<span class="tag late">تجاوز موعد 10:00</span>` : ""}
+      <div class="meta">${esc(b.phoneNumber || "-")} · الموظف: ${esc(b.staffName)}</div>
+      <div class="meta">الدخول: ${dtstr(b.checkInTime)} · الخروج المتوقع: ${dtstr(out, 10)}</div>
+      ${b.address ? `<div class="meta">العنوان/ملاحظة: ${esc(b.address)}</div>` : ""}
+      <span class="tag">${b.nightsCount||1} ليلة × ${fmt(b.nightPrice)} = ${fmt(total(b))}</span>
+      <span class="tag ${r ? "warn" : ""}">${r ? "متبقي " + fmt(r) : "مدفوع بالكامل"}</span>
+    </div></div>
+    <div class="acts">
+      ${r ? `<button class="sm pay" onclick="pay('${key}')">دفع</button>` : ""}
+      <button class="sm edit" onclick="openEdit('${key}')">تعديل</button>
+      <button class="sm ext" onclick="extend('${key}')">تمديد</button>
+      <button class="sm rc" onclick="receipt('b','${key}')">وصل</button>
+      <button class="sm out" onclick="checkout('${key}')">خروج</button>
+      <button class="sm del" onclick="delBooking('${key}')">حذف</button>
+    </div></div>`;
+}
+
+function render(){
+  const e = Object.entries(bookings), now = new Date();
+  const freeCount = N - e.length;
+  $("sBusy").textContent = e.length;
+  $("sFree").textContent = freeCount;
+  $("bnFreeNum").textContent = freeCount;
+  $("bnSub").textContent = e.length + " وحدات مشغولة من أصل " + N + " وحدات";
+  $("sRem").textContent = fmt(e.reduce((s, [, b]) => s + rest(b), 0));
+
+  const monthPaid = Object.values(payments).filter(p => {
+    if (!p || !p.time) return false;
+    const d = new Date(p.time);
+    return !isNaN(d) && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  }).reduce((s, p) => s + (Number(p.amount) || 0), 0);
+  $("sMonth").textContent = fmt(monthPaid);
+
+  const due = e.filter(([, b]) => outDate(b) <= now || sameDay(outDate(b), now));
+  $("dueList").innerHTML = due.length ? due.map(([k, b]) => guestCard(k, b, { showOverdue: true })).join("") : "لا أحد يخرج اليوم.";
+  $("list").innerHTML = e.length ? e.map(([k, b]) => guestCard(k, b)).join("") : "لا توجد حجوزات نشطة. سجّل وصول أول نزيل من نموذج الحجز.";
+
+  let g = "", offers = "";
+  for (let i = 1; i <= N; i++) {
+    const b = bookings["room_" + i];
+    g += `<div class="room ${b ? "busy" : ""}" onclick="${b ? "go('bookings')" : "quickBookRoom(" + i + ")"}">
+      <div class="room-top"><strong>وحدة ${i}</strong><span class="pill ${b ? "busy-p" : "free"}">${b ? "مشغولة" : "متاحة"}</span></div>
+      <div class="meta">${b ? esc(b.guestName) + "<br>خروج " + dtstr(outDate(b), 10) + (rest(b) ? "<br>متبقي " + fmt(rest(b)) : "") : "جاهزة لاستقبال ضيف · دخول 13:00"}</div></div>`;
+
+    offers += `<div class="offer-card ${b ? "busy-card" : ""}">
+      <div>
+        <div class="offer-top">
+          <span class="offer-title">وحدة رقم ${i}</span>
+          <span class="pill ${b ? "busy-p" : "free"}">${b ? "مشغولة" : "متاحة"}</span>
+        </div>
+        <div class="offer-box" style="margin-top:8px">
+          ${b
+            ? `<b>النزيل:</b> ${esc(b.guestName)}<br><span class="offer-sub">الخروج: ${dtstr(outDate(b), 10)}</span>`
+            : `<b>الحالة:</b> جاهزة للدخول (13:00)<br><span class="offer-sub">خروج اليوم التالي 10:00</span>`}
+        </div>
+      </div>
+      <div>
+        <div class="offer-price" style="margin-bottom:8px">${b ? (rest(b) ? "متبقي " + fmt(rest(b)) : "مدفوعة بالكامل") : "متاحة للحجز"}</div>
+        <button class="offer-btn ${b ? "" : "free-btn"}" onclick="${b ? "go('bookings')" : "quickBookRoom(" + i + ")"}">${b ? "إدارة الحجز" : "حجز الوحدة"}</button>
+      </div>
+    </div>`;
+  }
+  $("grid").innerHTML = g;
+  $("homeOffers").innerHTML = offers;
+  renderHist(); renderReport(); renderDay();
+}
+
+function renderHist(){
+  const q = $("q").value.trim().toLowerCase();
+  const items = Object.entries(history).filter(([, h]) => !q || (h.guestName||"").toLowerCase().includes(q) || (h.phoneNumber||"").includes(q))
+    .sort((a, b) => (b[1].checkOutTime||"").localeCompare(a[1].checkOutTime||"")).slice(0, 60);
+  $("hist").innerHTML = items.length ? items.map(([k, h]) => `<div class="item">
+    <strong>${esc(h.guestName)}</strong> — وحدة ${esc(h.roomNumber)}
+    <div class="meta">${esc(h.phoneNumber || "-")} · دخول ${dtstr(h.checkInTime)} ← خروج ${dtstr(h.checkOutTime)}</div>
+    <span class="tag">${h.nightsCount||1} ليلة · ${fmt(total(h))}</span>
+    <div class="acts"><button class="sm rc" onclick="receipt('h','${k}')">وصل</button><button class="sm del" onclick="delHist('${k}')">حذف</button></div></div>`).join("") : "لا توجد نتائج.";
+}
+$("q").addEventListener("input", renderHist);
+
+async function addNote(){
+  if (!requireAuth()) return;
+  const t = $("note").value.trim(); if (!t) return;
+  await db.ref("service_notes").push({ text: t, createdAt: new Date().toISOString(), byUid: currentAuthUid });
+  $("note").value = "";
+}
+async function delNote(k){
+  if (!requireAuth()) return;
+  await db.ref("service_notes/" + k).remove();
+}
+function listenNotes(){
+  const ref = db.ref("service_notes");
+  activeRefs.push(ref);
+  ref.on("value", s => {
+    const d = s.val() || {}, e = Object.entries(d).reverse();
+    $("notes").innerHTML = e.length ? e.map(([k, n]) => `<div class="item item-top"><span>• ${esc(n.text)}</span><button class="sm out" onclick="delNote('${k}')">حذف</button></div>`).join("") : '<p class="empty">لا توجد ملاحظات.</p>';
+  });
+}
+
+function bindRef(path, onSnap){
+  const ref = db.ref(path);
+  activeRefs.push(ref);
+  ref.on("value", onSnap);
+}
+
+function detachListeners(){
+  while (activeRefs.length) {
+    const ref = activeRefs.pop();
+    try { ref.off(); } catch {}
+  }
+  started = false;
+  notifReady = false;
+  bookings = {};
+  history = {};
+  payments = {};
+  notifs = {};
+  updateBell();
+}
+
+function start(){
+  if (started || !currentAuthUid) return; started = true;
+  attachNotifListener();
+  bindRef("settings/ntfyTopic", s => { ntfyTopic = s.val() || ""; $("ntopic").value = ntfyTopic; });
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js").then(reg => { swRegistration = reg; }).catch(() => {});
+  }
+  bindRef("bookings", s => { bookings = s.val() || {}; render(); });
+  bindRef("history", s => { history = s.val() || {}; render(); });
+  listenNotes();
+  bindRef("payments", s => { payments = s.val() || {}; render(); });
+  bindRef("settings/logo", s => { logo = s.val() || ""; showLogo(); });
+}
+
+let isSignup = false;
+$("toggleAuthMode").addEventListener("click", () => {
+  isSignup = !isSignup;
+  $("loginErr").textContent = "";
+  $("authTitle").textContent = isSignup ? "إنشاء حساب جديد" : "غابة الراحة";
+  $("authSub").textContent = isSignup ? "اختر اسم مستخدم وكلمة سر للدخول" : "سجّل الدخول للمتابعة";
+  $("authSubmit").textContent = isSignup ? "إنشاء الحساب" : "دخول";
+  $("toggleAuthMode").textContent = isSignup ? "لدي حساب بالفعل — تسجيل الدخول" : "إنشاء حساب جديد";
+});
+
+if (location.protocol === "file:") $("loginErr").textContent = "أنت تفتح الملف من الهاتف مباشرة. افتح رابط الموقع على Netlify.";
+
+auth.onAuthStateChanged(u => {
+  currentAuthUid = u ? u.uid : null;
+  $("login").style.display = u ? "none" : "flex";
+  if (u) start();
+  else detachListeners();
+});
+
+$("loginForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  $("loginErr").textContent = "";
+  const userPart = $("lmail").value.trim().toLowerCase().replace(/\s+/g, "");
+  const pass = $("lpass").value;
+  if (!userPart) { $("loginErr").textContent = "أدخل اسم المستخدم."; return; }
+  const email = userPart.includes("@") ? userPart : (userPart + "@jardin.dz");
+  const btn = $("authSubmit");
+  const prevText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = isSignup ? "جاري الإنشاء..." : "جاري الدخول...";
+  try {
+    if (isSignup) await auth.createUserWithEmailAndPassword(email, pass);
+    else await auth.signInWithEmailAndPassword(email, pass);
+    $("lpass").value = "";
+  } catch (err) {
+    const c = err && err.code || "";
+    $("loginErr").textContent =
+      location.protocol === "file:" || c === "auth/operation-not-supported-in-this-environment" ? "افتح التطبيق من رابط الموقع على Netlify، لا من الملف المحفوظ في الهاتف."
+      : c === "auth/email-already-in-use" ? "اسم المستخدم هذا مسجل مسبقاً."
+      : c === "auth/weak-password" ? "كلمة السر ضعيفة (يجب أن تكون 6 أحرف على الأقل)."
+      : c === "auth/network-request-failed" ? "لا يوجد اتصال بالإنترنت."
+      : c === "auth/too-many-requests" ? "محاولات كثيرة. انتظر دقائق ثم أعد المحاولة."
+      : c === "auth/configuration-not-found" || c === "auth/operation-not-allowed" ? "تسجيل الدخول غير مفعّل في Firebase."
+      : "اسم المستخدم أو كلمة السر غير صحيحة.";
+  } finally {
+    btn.disabled = false;
+    btn.textContent = prevText;
+  }
+});
+
+function logout(){
+  if (!confirm("تسجيل الخروج؟")) return;
+  detachListeners();
+  auth.signOut().then(() => location.reload());
+}
+
+function closePrint(){ $("printModal").classList.remove("open"); }
+function printDoc(title, body){
+  const docHtml = `<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>${esc(title)}</title><style>body{font-family:Tahoma,Arial,sans-serif;padding:18px;max-width:420px;margin:auto;color:#111}h2{text-align:center;margin-bottom:2px}.c{text-align:center;color:#555;font-size:13px;margin-bottom:10px}.r{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed #bbb;font-size:14px}.b{font-weight:700;font-size:16px}.tb{width:100%;border-collapse:collapse;font-size:13px}.tb td,.tb th{border-bottom:1px solid #ccc;padding:5px;text-align:right}.sig{margin-top:34px;display:flex;justify-content:space-between;font-size:13px}@media print{button{display:none}}</style></head><body>${body}<button onclick="print()" style="margin-top:16px;width:100%;padding:12px;font-size:15px">طباعة</button></body></html>`;
+  const w = window.open("", "_blank");
+  if (w) { w.document.write(docHtml); w.document.close(); return; }
+  $("pmBody").innerHTML = body;
+  $("printModal").classList.add("open");
+}
+
+function receipt(src, key){
+  const b = (src === "h" ? history : bookings)[key]; if (!b) return;
+  const out = b.checkOutTime ? new Date(b.checkOutTime) : outDate(b);
+  const row = (a, v) => `<div class="r"><span>${a}</span><span>${v}</span></div>`;
+  const no = (b.checkInTime || "").replace(/\D/g, "").slice(2, 12);
+  printDoc("وصل", `${logoHtml()}<h2>Le Jardin de Détente</h2><div class="c">غابة الراحة — جبل أمساعد</div><div class="c">وصل رقم ${no} · ${dstr(new Date())}</div>`
+    + row("النزيل", esc(b.guestName)) + row("الهاتف", esc(b.phoneNumber || "-")) + (b.idNumber ? row("الهوية", esc(b.idNumber)) : "")
+    + row("الوحدة", esc(b.roomNumber)) + row("الدخول", dtstr(b.checkInTime)) + row("الخروج", b.checkOutTime ? dtstr(b.checkOutTime) : dtstr(out, 10))
+    + row("الليالي", `${b.nightsCount||1} × ${fmt(b.nightPrice)}`) + row("الإجمالي", fmt(total(b))) + row("المدفوع", fmt(b.paid||0))
+    + `<div class="r b"><span>المتبقي</span><span>${fmt(rest(b))}</span></div><div class="sig"><span>الموظف: ${esc(b.staffName)}</span><span>توقيع النزيل</span></div>`);
+}
+
+const dkey = d => { const z = n => String(n).padStart(2, "0"); return d.getFullYear() + "-" + z(d.getMonth()+1) + "-" + z(d.getDate()); };
+const n0 = new Date(); $("rf").value = dkey(new Date(n0.getFullYear(), n0.getMonth(), 1)); $("rt").value = dkey(n0);
+let repData = null;
+function repHtml(d){
+  const rows = Object.keys(d.byRoom).sort((a, b) => a - b).map(r => { const x = d.byRoom[r]; return `<tr><td>وحدة ${esc(r)}</td><td>${x.n}</td><td>${x.nights}</td><td>${fmt(x.paid)}</td></tr>`; }).join("");
+  const row = (a, v, c) => `<div class="r ${c||""}"><span>${a}</span><span>${v}</span></div>`;
+  return row("عدد الإقامات", d.count) + row("عدد الليالي", d.nights) + row("إجمالي قيمة الحجوزات", fmt(d.total))
+    + row("المبلغ المحصّل", fmt(d.paid), "b") + row("غير محصّل", fmt(d.total - d.paid))
+    + (rows ? `<table class="tb"><tr><th>الوحدة</th><th>الإقامات</th><th>الليالي</th><th>المحصّل</th></tr>${rows}</table>` : "");
+}
+function renderReport(){
+  const f = $("rf").value, t = $("rt").value;
+  const items = Object.values(history).filter(h => {
+    if (!h || !h.checkOutTime) return false;
+    const dt = new Date(h.checkOutTime);
+    if (isNaN(dt)) return false;
+    const d = dkey(dt);
+    return (!f || d >= f) && (!t || d <= t);
+  });
+  const byRoom = {};
+  items.forEach(h => { const x = byRoom[h.roomNumber] ||= { n: 0, nights: 0, paid: 0 }; x.n++; x.nights += h.nightsCount||1; x.paid += h.paid||0; });
+  repData = { f, t, count: items.length, nights: items.reduce((s, h) => s + (h.nightsCount||1), 0), paid: items.reduce((s, h) => s + (h.paid||0), 0), total: items.reduce((s, h) => s + total(h), 0), byRoom };
+  $("rep").innerHTML = items.length ? repHtml(repData) : '<p class="empty" style="margin-bottom:10px">لا توجد إقامات منتهية في هذه الفترة.</p>';
+}
+$("rf").addEventListener("input", renderReport); $("rt").addEventListener("input", renderReport);
+function printReport(){
+  renderReport();
+  printDoc("تقرير", logoHtml() + `<h2>تقرير الإقامات</h2><div class="c">من ${repData.f || "-"} إلى ${repData.t || "-"}</div>` + repHtml(repData));
+}
+
+const logoHtml = () => logo ? `<div class="c"><img src="${logo}" style="max-height:70px" onerror="this.style.display='none'"></div>` : "";
+function showLogo(){
+  $("hLogo").style.display = logo ? "block" : "none"; if (logo) $("hLogo").src = logo;
+  $("logoPrev").style.display = logo ? "block" : "none"; if (logo) $("logoPrev").src = logo;
+}
+$("logoFile").addEventListener("change", e => {
+  if (!requireAuth()) { e.target.value = ""; return; }
+  const f = e.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = () => {
+    const img = new Image();
+    img.onload = () => {
+      const k = Math.min(1, 240 / Math.max(img.width, img.height)), c = document.createElement("canvas");
+      c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      db.ref("settings/logo").set(c.toDataURL("image/png")).then(() => alert("تم حفظ الشعار.")).catch(() => alert("تعذر حفظ الشعار."));
+    };
+    img.src = r.result;
+  };
+  r.readAsDataURL(f); e.target.value = "";
+});
+function removeLogo(){
+  if (!requireAuth()) return;
+  if (confirm("إزالة الشعار؟")) db.ref("settings/logo").remove();
+}
+
+async function logPay(amount, b, staffOverride){
+  const staffName = (staffOverride || $("staff").value || localStorage.getItem("staffName") || b.staffName || "-").trim() || "-";
+  try {
+    await db.ref("payments").push({
+      amount, staff: staffName, time: new Date().toISOString(),
+      room: b.roomNumber, guest: b.guestName, ci: b.checkInTime,
+      bookingId: b.bookingId || null, byUid: currentAuthUid
+    });
+  } catch {}
+}
+
+$("df").value = dkey(new Date());
+function dayData(){
+  const d = $("df").value || dkey(new Date());
+  const pays = Object.values(payments).filter(p => p && p.time && dkey(new Date(p.time)) === d);
+  const by = {};
+  pays.forEach(p => {
+    const st = (p.staff && p.staff.trim()) || "-";
+    const x = by[st] ||= { n: 0, sum: 0 };
+    x.n++;
+    x.sum += Number(p.amount) || 0;
+  });
+  const all = [...Object.values(bookings), ...Object.values(history)];
+  return {
+    d, by, sum: pays.reduce((s, p) => s + (Number(p.amount) || 0), 0),
+    ins: all.filter(b => b && b.checkInTime && dkey(new Date(b.checkInTime)) === d).length,
+    outs: Object.values(history).filter(h => h && h.checkOutTime && dkey(new Date(h.checkOutTime)) === d).length
+  };
+}
+function dayHtml(x){
+  const row = (a, v, c) => `<div class="r ${c || ""}"><span>${a}</span><span>${v}</span></div>`;
+  const rows = Object.keys(x.by).map(k => `<tr><td>${esc(k)}</td><td>${x.by[k].n}</td><td>${fmt(x.by[k].sum)}</td></tr>`).join("");
+  return row("وصول جديد", x.ins) + row("خروج", x.outs) + row("إجمالي المقبوضات", fmt(x.sum), "b")
+    + (rows ? `<table class="tb"><tr><th>الموظف</th><th>العمليات</th><th>المبلغ</th></tr>${rows}</table>` : "");
+}
+function renderDay(){ $("day").innerHTML = dayHtml(dayData()); }
+$("df").addEventListener("input", renderDay);
+function printDay(){ const x = dayData(); printDoc("تقرير يومي", logoHtml() + `<h2>التقرير اليومي</h2><div class="c">${x.d}</div>` + dayHtml(x)); }
+
+function matchesBookingPay(p, b){
+  if (!p || !b) return false;
+  if (b.bookingId && p.bookingId) return p.bookingId === b.bookingId;
+  return p.ci === b.checkInTime && p.room === b.roomNumber;
+}
+
+function matchesBookingNotif(n, b){
+  if (!n || !b) return false;
+  if (b.bookingId && n.bookingId) return n.bookingId === b.bookingId;
+  if (!n.title) return false;
+  const sameRoom = n.title.includes("وحدة " + b.roomNumber);
+  const sameGuest = Boolean(b.guestName && n.body && n.body.includes(b.guestName));
+  const afterCheckIn = !b.checkInTime || !n.time || n.time >= b.checkInTime;
+  return sameRoom && sameGuest && afterCheckIn;
+}
+
+async function removeBooking(path, b){
+  const up = { [path]: null };
+  Object.entries(payments).forEach(([k, p]) => { if (matchesBookingPay(p, b)) up["payments/" + k] = null; });
+  Object.entries(notifs).forEach(([k, n]) => { if (matchesBookingNotif(n, b)) up["notifications/" + k] = null; });
+
+  await db.ref("deleted").push({
+    ...b,
+    deletedAt: new Date().toISOString(),
+    deletedBy: ($("staff").value || localStorage.getItem("staffName") || "-").trim() || "-",
+    deletedByUid: currentAuthUid
+  });
+  await db.ref().update(up);
+}
+async function delBooking(key){
+  if (!requireAuth()) return;
+  const b = bookings[key]; if (!b) return;
+  if (!confirm("حذف حجز " + b.guestName + " (وحدة " + b.roomNumber + ") نهائياً؟\nلن يدخل في التقارير. استعمله للحجز المسجّل بالخطأ فقط.")) return;
+  try { await removeBooking("bookings/" + key, b); } catch { alert("تعذر الحذف."); }
+}
+async function delHist(key){
+  if (!requireAuth()) return;
+  const b = history[key]; if (!b) return;
+  if (!confirm("حذف سجل " + b.guestName + " نهائياً من التقارير؟")) return;
+  try { await removeBooking("history/" + key, b); } catch { alert("تعذر الحذف."); }
+}
+
+function exportData(type){
+  if (!requireAuth()) return;
+  const isHistory = type === "history";
+  const dataObj = isHistory ? history : bookings;
+  const items = Object.values(dataObj).filter(Boolean);
+
+  if (!items.length) return alert("لا توجد بيانات لتصديرها.");
+
+  items.sort((a, b) => {
+    const da = new Date(isHistory ? (b.checkOutTime || b.checkInTime || 0) : (b.checkInTime || 0)).getTime() || 0;
+    const dbTime = new Date(isHistory ? (a.checkOutTime || a.checkInTime || 0) : (a.checkInTime || 0)).getTime() || 0;
+    return da - dbTime;
+  });
+
+  const headers = [
+    "الاسم واللقب", "رقم الهاتف", "الوحدة", "الجنسية", "رقم الهوية",
+    "تاريخ الدخول", "تاريخ الخروج", "عدد الليالي", "سعر الليلة",
+    "الإجمالي", "المدفوع", "المتبقي", "الموظف"
+  ];
+
+  const rows = items.map(b => {
+    const t = total(b);
+    const r = rest(b);
+    const out = b.checkOutTime ? dtstr(b.checkOutTime) : dtstr(outDate(b), 10);
+    return [
+      b.guestName || "-",
+      b.phoneNumber || "-",
+      b.roomNumber || "-",
+      b.nationality || "-",
+      b.idNumber || "-",
+      dtstr(b.checkInTime),
+      out,
+      b.nightsCount || 1,
+      b.nightPrice || 0,
+      t,
+      b.paid || 0,
+      r,
+      b.staffName || "-"
+    ];
+  });
+
+  const wrap = val => `"${String(val ?? "").replace(/"/g, '""')}"`;
+  const csvContent = "\uFEFF" + [headers, ...rows].map(row => row.map(wrap).join(",")).join("\n");
+
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  const dateStr = dkey(new Date());
+  link.href = url;
+  link.download = `غابة_الراحة_${isHistory ? "سجل_الخروج" : "الحجوزات"}_${dateStr}.csv`;
+  link.style.visibility = "hidden";
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+</script>
+</body>
+</html>
